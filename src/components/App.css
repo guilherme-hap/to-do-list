@@ -1,0 +1,190 @@
+/* Geral */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Container principal para a ToDo List e Spotify */
+.app {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 100vh;
+  width: 100%; 
+  background-color: #f4f4f4;
+  transition: background-color 0.5s ease; 
+}
+
+
+.sidebar {
+  width: 300px; 
+  background-color: #343a40;
+  color: #fff;
+  padding: 30px; 
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  height: 100vh;
+  transition: width 0.3s ease, background-color 0.3s ease; /* Animação ao passar o mouse */
+}
+
+.sidebar:hover {
+  width: 350px; 
+  background-color: #2c3e50;
+}
+
+.sidebar h2 {
+  color: #fff;
+  font-size: 28px; 
+  margin-bottom: 30px;
+  transition: transform 0.3s ease; /* Animação de título */
+}
+
+.sidebar h2:hover {
+  transform: translateX(10px); 
+}
+
+.sidebar p {
+  color: #ccc;
+}
+
+.sidebar button {
+  background-color: #e74c3c;
+  color: white;
+  padding: 15px; 
+  font-size: 18px; 
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease; /* Transição suave do botão */
+}
+
+.sidebar button:hover {
+  background-color: #c0392b;
+  transform: scale(1.05); 
+}
+
+
+.main-content {
+  display: flex;
+  flex-direction: row;
+  width: 100%; 
+  height: 100vh;
+  justify-content: space-between;
+  padding: 30px; 
+  overflow: hidden;
+  animation: slideIn 0.5s ease-out; /* Animação de deslizamento do conteúdo principal */
+}
+
+
+.todo-container {
+  flex: 3; 
+  background-color: #fff;
+  padding: 30px; 
+  overflow-y: auto;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  height: 100%; 
+  transition: transform 0.3s ease; 
+}
+
+.todo-container:hover {
+  transform: scale(1.05); 
+}
+
+.todo-container header {
+  margin-bottom: 30px; 
+  animation: fadeIn 1s ease-out; /* Animação de fade-in para o cabeçalho */
+}
+
+.todo-container input,
+.todo-container select,
+.todo-container button {
+  margin: 15px 0; 
+  padding: 15px;
+  width: 100%;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: all 0.3s ease; 
+}
+
+.todo-container button {
+  background-color: #3498db;
+  color: white;
+  cursor: pointer;
+}
+
+.todo-container button:hover {
+  background-color: #2980b9;
+  transform: scale(1.05); /* Efeito de crescimento no hover */
+}
+
+.todo-container ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.todo-container li {
+  background-color: #f9f9f9;
+  margin: 15px 0; 
+  padding: 20px;
+  font-size: 18px; 
+  border-radius: 4px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease; 
+}
+
+.todo-container li:hover {
+  background-color: #ecf0f1; /* Efeito de cor de fundo ao passar o mouse */
+}
+
+.todo-container li button {
+  background-color: #e74c3c;
+  color: white;
+  padding: 10px 15px; 
+  font-size: 18px; 
+  border: none;
+  cursor: pointer;
+}
+
+.todo-container li button:hover {
+  background-color: #c0392b;
+  transform: scale(1.1); 
+}
+
+
+.spotify-iframe {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0; 
+  width: 40%; 
+  height: 100%; 
+  max-width: 600px; 
+  max-height: 800px; 
+  margin-left: 30px;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  animation: fadeIn 1s ease-out; 
+}
+
+/* Animação de entrada para o conteúdo */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Animação de fade-in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
