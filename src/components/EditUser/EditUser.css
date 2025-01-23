@@ -2,7 +2,7 @@
     padding: 30px;
     background-color: #f9f9f9;
     border-radius: 8px;
-    width: 700px; /* Aumenta o tamanho horizontal */
+    width: 700px; 
     margin: 0 auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
@@ -72,7 +72,7 @@
   }
   
   .btn-save {
-    background-color: #007BFF; /* Cor azul para o botão de salvar */
+    background-color: #007BFF; 
     color: white;
   }
   
