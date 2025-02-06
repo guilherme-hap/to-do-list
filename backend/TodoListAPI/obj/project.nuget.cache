@@ -2,10 +2,10 @@
   "version": 2,
   "dgSpecHash": "tWJw2sVt4AA=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Pichau\\Documents\\to-do-list\\backend\\TodoListAPI\\TodoListAPI.csproj",
+  "projectFilePath": "$(UserProfile)\\Documents\\to-do-list\\backend\\TodoListAPI\\TodoListAPI.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Pichau\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.1\\microsoft.aspnetcore.openapi.9.0.1.nupkg.sha512",
-    "C:\\Users\\Pichau\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+    "$(UserProfile)\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.1\\microsoft.aspnetcore.openapi.9.0.1.nupkg.sha512",
+    "$(UserProfile)\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
   ],
   "logs": []
 }

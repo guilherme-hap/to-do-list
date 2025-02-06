@@ -80,14 +80,14 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Pichau\\Documents\\to-do-list\\backend\\TodoListAPI\\TodoListAPI.csproj",
+      "projectUniqueName": "$(ProjectDir)TodoListAPI.csproj",
       "projectName": "TodoListAPI",
-      "projectPath": "C:\\Users\\Pichau\\Documents\\to-do-list\\backend\\TodoListAPI\\TodoListAPI.csproj",
-      "packagesPath": "C:\\Users\\Pichau\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Pichau\\Documents\\to-do-list\\backend\\TodoListAPI\\obj\\",
+      "projectPath": "$(ProjectDir)TodoListAPI.csproj",
+      "packagesPath": "$(UserProfile)\\.nuget\\packages\\",
+      "outputPath": "$(ProjectDir)obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Pichau\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "$(AppData)\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -141,7 +141,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "$(ProgramFiles)\\dotnet\\sdk\\9.0.102/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
