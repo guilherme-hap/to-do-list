@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./EditUser.css";  
+import { Form, Button, Container, Row, Col, Image } from "react-bootstrap";
 
 const EditUser = ({ user, setUser, onSwitchPage }) => {
   const [editedUser, setEditedUser] = useState({ ...user });
@@ -9,102 +9,97 @@ const EditUser = ({ user, setUser, onSwitchPage }) => {
     const { name, value } = e.target;
     setEditedUser((prevState) => ({ ...prevState, [name]: value }));
 
-
     if (name === "photo" && e.target.files.length > 0) {
       const file = e.target.files[0];
-      setPhotoPreview(URL.createObjectURL(file)); 
+      setPhotoPreview(URL.createObjectURL(file));
     }
   };
 
   const handleSave = () => {
-    setUser(editedUser);  
-    onSwitchPage("todo"); 
+    setUser(editedUser);
+    onSwitchPage("todo");
   };
 
   return (
-    <div className="edit-user-container">
-      <h2>Editar Usuário</h2>
+    <Container className="p-4">
+      <h2 className="mb-4">Editar Usuário</h2>
 
-      <div className="photo-preview">
-        {photoPreview ? (
-          <img src={photoPreview} alt="Foto do usuário" className="photo-image" />
-        ) : (
-          <div className="photo-placeholder">Sem foto</div>
-        )}
-      </div>
+      <Row className="mb-4">
+        <Col className="text-center">
+          {photoPreview ? (
+            <Image src={photoPreview} alt="Foto do usuário" rounded fluid />
+          ) : (
+            <div className="border p-4">Sem foto</div>
+          )}
+        </Col>
+      </Row>
 
-      <div className="form-group">
-        <label htmlFor="photo">Foto</label>
-        <input
-          type="file"
-          id="photo"
-          name="photo"
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
+      <Form>
+        <Form.Group controlId="photo" className="mb-3">
+          <Form.Label className="fw-bold">Foto</Form.Label>
+          <Form.Control type="file" name="photo" onChange={handleChange} />
+        </Form.Group>
 
-      <div className="form-group">
-        <label htmlFor="name">Nome</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={editedUser.name}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="lastName">Sobrenome</label>
-        <input
-          type="text"
-          id="lastName"
-          name="lastName"
-          value={editedUser.lastName}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="email">E-mail</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={editedUser.email}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="address">Endereço</label>
-        <input
-          type="text"
-          id="address"
-          name="address"
-          value={editedUser.address}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="birthDate">Data de Nascimento</label>
-        <input
-          type="date"
-          id="birthDate"
-          name="birthDate"
-          value={editedUser.birthDate}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
+        <Form.Group controlId="name" className="mb-3">
+          <Form.Label className="fw-bold">Nome</Form.Label>
+          <Form.Control
+            type="text"
+            name="name"
+            value={editedUser.name}
+            onChange={handleChange}
+          />
+        </Form.Group>
 
-      <div className="form-actions">
-        <button onClick={handleSave} className="btn-save">Salvar</button>
-        <button onClick={() => onSwitchPage("todo")} className="btn-cancel">Cancelar</button>
-      </div>
-    </div>
+        <Form.Group controlId="lastName" className="mb-3">
+          <Form.Label className="fw-bold">Sobrenome</Form.Label>
+          <Form.Control
+            type="text"
+            name="lastName"
+            value={editedUser.lastName}
+            onChange={handleChange}
+          />
+        </Form.Group>
+
+        <Form.Group controlId="email" className="mb-3">
+          <Form.Label className="fw-bold">E-mail</Form.Label>
+          <Form.Control
+            type="email"
+            name="email"
+            value={editedUser.email}
+            onChange={handleChange}
+          />
+        </Form.Group>
+
+        <Form.Group controlId="address" className="mb-3">
+          <Form.Label className="fw-bold">Endereço</Form.Label>
+          <Form.Control
+            type="text"
+            name="address"
+            value={editedUser.address}
+            onChange={handleChange}
+          />
+        </Form.Group>
+
+        <Form.Group controlId="birthDate" className="mb-3">
+          <Form.Label className="fw-bold">Data de Nascimento</Form.Label>
+          <Form.Control
+            type="date"
+            name="birthDate"
+            value={editedUser.birthDate}
+            onChange={handleChange}
+          />
+        </Form.Group>
+
+        <div className="d-flex justify-content-between">
+          <Button variant="primary" onClick={handleSave}>
+            Salvar
+          </Button>
+          <Button variant="secondary" onClick={() => onSwitchPage("todo")}>
+            Cancelar
+          </Button>
+        </div>
+      </Form>
+    </Container>
   );
 };
 
