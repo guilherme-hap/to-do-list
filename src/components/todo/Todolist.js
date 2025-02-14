@@ -1,56 +1,13 @@
-import React, { useState } from "react";
-import { Container, Form, Button, ListGroup, Card } from "react-bootstrap";
+import React from "react";
+import { Container, Form, Button } from "react-bootstrap";
 
-function ToDoList({ user }) {
-  const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState({
-    title: "",
-    description: "",
-    date: "",
-    startTime: "",
-    endTime: "",
-  });
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentTaskIndex, setCurrentTaskIndex] = useState(null);
-
-  const addTask = (e) => {
-    e.preventDefault();
-    if (
-      newTask.title.trim() &&
-      newTask.description.trim() &&
-      newTask.startTime.trim() &&
-      newTask.endTime.trim() &&
-      newTask.date.trim()
-    ) {
-      if (isEditing) {
-        const updatedTasks = [...tasks];
-        updatedTasks[currentTaskIndex] = newTask;
-        setTasks(updatedTasks);
-        setIsEditing(false);
-      } else {
-        setTasks([...tasks, newTask]);
-      }
-      setNewTask({
-        title: "",
-        description: "",
-        date: "",
-        startTime: "",
-        endTime: "",
-      });
-    }
-  };
-
-  const editTask = (index) => {
-    setNewTask(tasks[index]);
-    setIsEditing(true);
-    setCurrentTaskIndex(index);
-  };
-
-  const deleteTask = (index) => {
-    const updatedTasks = tasks.filter((_, i) => i !== index);
-    setTasks(updatedTasks);
-  };
-
+function ToDoList({
+  user,
+  newTask,
+  setNewTask,
+  isEditing,
+  addTask,
+}) {
   return (
     <Container className="p-4">
       <header className="mb-4">
@@ -104,33 +61,6 @@ function ToDoList({ user }) {
           {isEditing ? "Atualizar Tarefa" : "Adicionar Tarefa"}
         </Button>
       </Form>
-      <ListGroup className="mt-4">
-        {tasks.map((task, index) => (
-          <ListGroup.Item key={index} className="mb-2">
-            <Card>
-              <Card.Body>
-                <Card.Title>{task.title}</Card.Title>
-                <Card.Text>{task.description}</Card.Text>
-                <Card.Text>
-                  <strong>Data:</strong> {task.date}
-                </Card.Text>
-                <Card.Text>
-                  <strong>Hora de Início:</strong> {task.startTime}
-                </Card.Text>
-                <Card.Text>
-                  <strong>Hora do Fim:</strong> {task.endTime}
-                </Card.Text>
-                <Button variant="warning" onClick={() => editTask(index)} className="me-2">
-                  Editar
-                </Button>
-                <Button variant="danger" onClick={() => deleteTask(index)}>
-                  Deletar
-                </Button>
-              </Card.Body>
-            </Card>
-          </ListGroup.Item>
-        ))}
-      </ListGroup>
     </Container>
   );
 }
