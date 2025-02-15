@@ -1,15 +1,19 @@
 import React from "react";
-import { ListGroup, Card, Button } from "react-bootstrap";
+import { Accordion, Card, Button } from "react-bootstrap";
 
 const TaskList = ({ tasks, editTask, deleteTask }) => {
   return (
-    <ListGroup className="mt-4">
+    <Accordion className="mt-4">
       {tasks.map((task, index) => (
-        <ListGroup.Item key={index} className="mb-2">
-          <Card>
-            <Card.Body>
-              <Card.Title>{task.title}</Card.Title>
-              <Card.Text>{task.description}</Card.Text>
+        <Accordion.Item eventKey={index.toString()} key={index}>
+          <Accordion.Header as={Card.Header} style={{ cursor: "pointer" }}>
+            {task.title}
+          </Accordion.Header>
+          <Accordion.Collapse eventKey={index.toString()} transition="true">
+            <Card.Body className="p-3">
+              <Card.Text>
+                <strong>Descrição:</strong> {task.description}
+              </Card.Text>
               <Card.Text>
                 <strong>Data:</strong> {task.date}
               </Card.Text>
@@ -19,6 +23,18 @@ const TaskList = ({ tasks, editTask, deleteTask }) => {
               <Card.Text>
                 <strong>Hora do Fim:</strong> {task.endTime}
               </Card.Text>
+              <Card.Text>
+                <strong>Categoria:</strong> {task.category}
+              </Card.Text>
+              <Card.Text>
+                <strong>Lista:</strong> {task.list}
+              </Card.Text>
+              <Card.Text>
+                <strong>Prioridade:</strong> {task.priority}
+              </Card.Text>
+              <Card.Text>
+                <strong>Status:</strong> {task.status}
+              </Card.Text>
               <Button variant="warning" onClick={() => editTask(index)} className="me-2">
                 Editar
               </Button>
@@ -26,10 +42,10 @@ const TaskList = ({ tasks, editTask, deleteTask }) => {
                 Deletar
               </Button>
             </Card.Body>
-          </Card>
-        </ListGroup.Item>
+          </Accordion.Collapse>
+        </Accordion.Item>
       ))}
-    </ListGroup>
+    </Accordion>
   );
 };
 

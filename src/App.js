@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Nav } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Login from "./components/login/Login";
 import Register from "./components/register/Register";
@@ -25,9 +25,15 @@ function App() {
     date: "",
     startTime: "",
     endTime: "",
+    category: "",
+    list: "",
+    priority: "",
+    status: ""
   });
   const [isEditing, setIsEditing] = useState(false);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(null);
+  const [selectedList, setSelectedList] = useState("Semestre");
+  const [lists, setLists] = useState(["Semestre", "Sprint", "Diversão"]);
 
   const handleLogout = () => {
     setLoggedInUser({ name: "", email: "" });
@@ -42,10 +48,6 @@ function App() {
     setCurrentPage("todo");
   };
 
-  // const handleUserClick = () => {
-  //   setCurrentPage("todo");
-  // };
-
   const addTask = (e) => {
     e.preventDefault();
     if (
@@ -53,7 +55,11 @@ function App() {
       newTask.description.trim() &&
       newTask.startTime.trim() &&
       newTask.endTime.trim() &&
-      newTask.date.trim()
+      newTask.date.trim() &&
+      newTask.category.trim() &&
+      newTask.list.trim() &&
+      newTask.priority.trim() &&
+      newTask.status.trim()
     ) {
       if (isEditing) {
         const updatedTasks = [...tasks];
@@ -69,6 +75,10 @@ function App() {
         date: "",
         startTime: "",
         endTime: "",
+        category: "",
+        list: "",
+        priority: "",
+        status: "",
       });
     }
   };
@@ -84,17 +94,21 @@ function App() {
     setTasks(updatedTasks);
   };
 
+  const addList = (newList) => {
+    if (newList && !lists.includes(newList)) {
+      setLists([...lists, newList]);
+    }
+  };
+
   return (
     <Container fluid className="d-flex flex-column min-vh-100">
       {loggedInUser.name ? (
         <Row>
-
           <NavigationBar
             onHomeClick={handleHomeClick}
             onLogout={handleLogout}
             onEditUser={handleEditUser}
           />
-
           {currentPage === "editUser" && (
             <EditUser
               user={loggedInUser}
@@ -102,7 +116,6 @@ function App() {
               onSwitchPage={setCurrentPage}
             />
           )}
-
           {currentPage === "todo" && (
             <Col md={6} className="p-3 mx-auto">
               <>
@@ -112,11 +125,12 @@ function App() {
                   setNewTask={setNewTask}
                   isEditing={isEditing}
                   addTask={addTask}
+                  addList={addList}
+                  lists={lists}
                 />
               </>
             </Col>
           )}
-    
           {currentPage === "todo" && (
             <Col md={6} className="d-flex justify-content-center align-items-start p-3">
               <div className="w-100">
@@ -130,11 +144,17 @@ function App() {
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                   loading="lazy"
                 ></iframe>
-                <TaskList tasks={tasks} editTask={editTask} deleteTask={deleteTask} />
+                <Nav variant="tabs" activeKey={selectedList} onSelect={(selectedKey) => setSelectedList(selectedKey)}>
+                  {lists.map((list, index) => (
+                    <Nav.Item key={index}>
+                      <Nav.Link eventKey={list}>{list}</Nav.Link>
+                    </Nav.Item>
+                  ))}
+                </Nav>
+                <TaskList tasks={tasks.filter(task => task.list === selectedList)} editTask={editTask} deleteTask={deleteTask}/>
               </div>
             </Col>
           )}
-
         </Row>
       ) : (
         <Row className="flex-grow-1">
