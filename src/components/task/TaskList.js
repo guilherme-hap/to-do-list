@@ -1,13 +1,15 @@
 import React from "react";
 import { Accordion, Card, Button } from "react-bootstrap";
+import "./TaskList.css";
 
-const TaskList = ({ tasks, editTask, deleteTask }) => {
+const TaskList = ({ tasks, editTask, deleteTask, toggleFavorite }) => {
   return (
     <Accordion className="mt-4">
       {tasks.map((task, index) => (
         <Accordion.Item eventKey={index.toString()} key={index}>
           <Accordion.Header as={Card.Header} style={{ cursor: "pointer" }}>
             {task.title}
+            {task.favorite && <span className="favorite"> ★</span>}
           </Accordion.Header>
           <Accordion.Collapse eventKey={index.toString()} transition="true">
             <Card.Body className="p-3">
@@ -38,8 +40,11 @@ const TaskList = ({ tasks, editTask, deleteTask }) => {
               <Button variant="warning" onClick={() => editTask(index)} className="me-2">
                 Editar
               </Button>
-              <Button variant="danger" onClick={() => deleteTask(index)}>
+              <Button variant="danger" onClick={() => deleteTask(index)} className="me-2">
                 Deletar
+              </Button>
+              <Button variant="info" onClick={() => toggleFavorite(index)}>
+                {task.favorite ? "Desfavoritar" : "Favoritar"}
               </Button>
             </Card.Body>
           </Accordion.Collapse>

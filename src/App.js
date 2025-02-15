@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Nav } from "react-bootstrap";
+import { Container, Row, Col, Nav, Form, Dropdown, DropdownButton, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Login from "./components/login/Login";
 import Register from "./components/register/Register";
@@ -28,12 +28,17 @@ function App() {
     category: "",
     list: "",
     priority: "",
-    status: ""
+    status: "",
+    favorite: false
   });
   const [isEditing, setIsEditing] = useState(false);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(null);
   const [selectedList, setSelectedList] = useState("Semestre");
   const [lists, setLists] = useState(["Semestre", "Sprint", "Diversão"]);
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterDate, setFilterDate] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState("");
+  const [showResetButton, setShowResetButton] = useState(false);
 
   const handleLogout = () => {
     setLoggedInUser({ name: "", email: "" });
@@ -79,6 +84,7 @@ function App() {
         list: "",
         priority: "",
         status: "",
+        favorite: false
       });
     }
   };
@@ -94,10 +100,35 @@ function App() {
     setTasks(updatedTasks);
   };
 
+  const toggleFavorite = (index) => {
+    const updatedTasks = tasks.map((task, i) => 
+      i === index ? { ...task, favorite: !task.favorite } : task
+    );
+    setTasks(updatedTasks);
+  };
+
   const addList = (newList) => {
     if (newList && !lists.includes(newList)) {
       setLists([...lists, newList]);
     }
+  };
+
+  const filteredTasks = tasks.filter(task => 
+    task.list === selectedList &&
+    (filterStatus ? task.status === filterStatus : true) &&
+    (filterDate ? task.date === filterDate : true)
+  );
+
+  const resetFilters = () => {
+    setFilterStatus("");
+    setFilterDate("");
+    setSelectedFilter("");
+    setShowResetButton(false);
+  };
+
+  const handleFilterSelect = (filter) => {
+    setSelectedFilter(filter);
+    setShowResetButton(true);
   };
 
   return (
@@ -118,17 +149,15 @@ function App() {
           )}
           {currentPage === "todo" && (
             <Col md={6} className="p-3 mx-auto">
-              <>
-                <ToDoList
-                  user={loggedInUser}
-                  newTask={newTask}
-                  setNewTask={setNewTask}
-                  isEditing={isEditing}
-                  addTask={addTask}
-                  addList={addList}
-                  lists={lists}
-                />
-              </>
+              <ToDoList
+                user={loggedInUser}
+                newTask={newTask}
+                setNewTask={setNewTask}
+                isEditing={isEditing}
+                addTask={addTask}
+                addList={addList}
+                lists={lists}
+              />
             </Col>
           )}
           {currentPage === "todo" && (
@@ -151,7 +180,41 @@ function App() {
                     </Nav.Item>
                   ))}
                 </Nav>
-                <TaskList tasks={tasks.filter(task => task.list === selectedList)} editTask={editTask} deleteTask={deleteTask}/>
+                <DropdownButton id="dropdown-filters" title="Filtros" className="mb-3 mt-3">
+                  <Dropdown.Item onClick={() => handleFilterSelect("status")}>Filtrar por Status</Dropdown.Item>
+                  <Dropdown.Item onClick={() => handleFilterSelect("date")}>Filtrar por Data de Vencimento</Dropdown.Item>
+                </DropdownButton>
+                {showResetButton && (
+                  <Button variant="secondary" onClick={resetFilters} className="mb-3">
+                    Remover Filtros
+                  </Button>
+                )}
+                {selectedFilter === "status" && (
+                  <Form.Group controlId="formFilterStatus" className="mb-3">
+                    <Form.Label className="fw-bold">Filtrar por Status</Form.Label>
+                    <Form.Control
+                      as="select"
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                    >
+                      <option value="">Todos</option>
+                      <option value="Pendente">Pendente</option>
+                      <option value="Em desenvolvimento">Em desenvolvimento</option>
+                      <option value="Concluída">Concluída</option>
+                    </Form.Control>
+                  </Form.Group>
+                )}
+                {selectedFilter === "date" && (
+                  <Form.Group controlId="formFilterDate" className="mb-3">
+                    <Form.Label className="fw-bold">Filtrar por Data de Vencimento</Form.Label>
+                    <Form.Control
+                      type="date"
+                      value={filterDate}
+                      onChange={(e) => setFilterDate(e.target.value)}
+                    />
+                  </Form.Group>
+                )}
+                <TaskList tasks={filteredTasks} editTask={editTask} deleteTask={deleteTask} toggleFavorite={toggleFavorite}/>
               </div>
             </Col>
           )}
