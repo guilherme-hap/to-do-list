@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Nav, Form, Dropdown, DropdownButton, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Login from "./components/login/Login";
@@ -7,6 +7,7 @@ import ToDoList from "./components/todo/Todolist";
 import EditUser from "./components/EditUser/EditUser";
 import NavigationBar from "./components/navbar/Navbar";
 import TaskList from "./components/task/TaskList";
+import api from "./components/api/api";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("login");
@@ -20,25 +21,43 @@ function App() {
   });
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState({
-    title: "",
-    description: "",
-    date: "",
-    startTime: "",
-    endTime: "",
-    category: "",
-    list: "",
-    priority: "",
+    id: "",
+    inativo: false,
+    dataCriacao: "",
+    titulo: "",
+    descricao: "",
+    prioridade: "",
     status: "",
-    favorite: false
+    dataLimite: "",
+    listaId: "",
+    categoriaId: ""
   });
   const [isEditing, setIsEditing] = useState(false);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(null);
-  const [selectedList, setSelectedList] = useState("Semestre");
-  const [lists, setLists] = useState(["Semestre", "Sprint", "Diversão"]);
+  const [selectedList, setSelectedList] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDate, setFilterDate] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("");
   const [showResetButton, setShowResetButton] = useState(false);
+  const [lists, setLists] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    if (selectedList) {
+      fetchTasks();
+    }
+  }, [selectedList]);
+
+  const fetchTasks = async () => {
+    try {
+      const response = await api.get(`https://localhost:7068/Tarefa`);
+      if (response.status === 200) {
+        setTasks(response.data);
+      }
+    } catch (error) {
+      console.log("Erro ao buscar tarefas:", error.message);
+    }
+  };
 
   const handleLogout = () => {
     setLoggedInUser({ name: "", email: "" });
@@ -54,16 +73,12 @@ function App() {
   };
 
   const addTask = (e) => {
-    e.preventDefault();
     if (
-      newTask.title.trim() &&
-      newTask.description.trim() &&
-      newTask.startTime.trim() &&
-      newTask.endTime.trim() &&
-      newTask.date.trim() &&
-      newTask.category.trim() &&
-      newTask.list.trim() &&
-      newTask.priority.trim() &&
+      newTask.titulo.trim() &&
+      newTask.descricao.trim() &&
+      newTask.dataLimite.trim() &&
+      newTask.categoriaId.trim() &&
+      newTask.prioridade.trim() &&
       newTask.status.trim()
     ) {
       if (isEditing) {
@@ -75,16 +90,16 @@ function App() {
         setTasks([...tasks, newTask]);
       }
       setNewTask({
-        title: "",
-        description: "",
-        date: "",
-        startTime: "",
-        endTime: "",
-        category: "",
-        list: "",
-        priority: "",
+        id: "",
+        inativo: false,
+        dataCriacao: "",
+        titulo: "",
+        descricao: "",
+        prioridade: "",
         status: "",
-        favorite: false
+        dataLimite: "",
+        listaId: "",
+        categoriaId: ""
       });
     }
   };
@@ -107,16 +122,10 @@ function App() {
     setTasks(updatedTasks);
   };
 
-  const addList = (newList) => {
-    if (newList && !lists.includes(newList)) {
-      setLists([...lists, newList]);
-    }
-  };
-
   const filteredTasks = tasks.filter(task => 
-    task.list === selectedList &&
+    task.listaId === selectedList &&
     (filterStatus ? task.status === filterStatus : true) &&
-    (filterDate ? task.date === filterDate : true)
+    (filterDate ? task.dataLimite === filterDate : true)
   );
 
   const resetFilters = () => {
@@ -155,8 +164,13 @@ function App() {
                 setNewTask={setNewTask}
                 isEditing={isEditing}
                 addTask={addTask}
-                addList={addList}
                 lists={lists}
+                setLists={setLists}
+                categories={categories}
+                setCategories={setCategories}
+                setTasks={setTasks}
+                selectedList={selectedList}
+                setSelectedList={setSelectedList}
               />
             </Col>
           )}
@@ -174,9 +188,9 @@ function App() {
                   loading="lazy"
                 ></iframe>
                 <Nav variant="tabs" activeKey={selectedList} onSelect={(selectedKey) => setSelectedList(selectedKey)}>
-                  {lists.map((list, index) => (
-                    <Nav.Item key={index}>
-                      <Nav.Link eventKey={list}>{list}</Nav.Link>
+                  {lists.map((list) => (
+                    <Nav.Item key={list.id}>
+                      <Nav.Link eventKey={list.id}>{list.nome}</Nav.Link>
                     </Nav.Item>
                   ))}
                 </Nav>
@@ -214,7 +228,7 @@ function App() {
                     />
                   </Form.Group>
                 )}
-                <TaskList tasks={filteredTasks} editTask={editTask} deleteTask={deleteTask} toggleFavorite={toggleFavorite}/>
+                <TaskList tasks={filteredTasks} editTask={editTask} deleteTask={deleteTask} toggleFavorite={toggleFavorite} fetchTasks={fetchTasks} />
               </div>
             </Col>
           )}

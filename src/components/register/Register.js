@@ -1,14 +1,29 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import axios from "axios";
 
-function Register({ onSwitchPage }) {
+function Register({ onSwitchPage, setUser, setError }) {
+  const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [senha, setSenha] = useState("");
+  const [inativo, setInativo] = useState(false);
 
-  const handleRegister = () => {
-    // Lógica de registro (alterada depois com a validação no banco
-    console.log("Registrando usuário:", email, password);
-    onSwitchPage("login");
+  const handleRegister = async () => {
+    try {
+      const response = await axios.post("https://localhost:7068/Usuario", {
+        nome,
+        email,
+        senha,
+        inativo
+      });
+
+      if (response.status === 200) {
+        onSwitchPage("login");
+      } 
+    } catch (error) {
+      setError("Erro ao se registrar. Contate o suporte.");
+      console.log("Erro ao registrar:", error.message);
+    }
   };
 
   return (
@@ -18,6 +33,16 @@ function Register({ onSwitchPage }) {
           <div className="p-4 bg-white rounded shadow-sm">
             <h2 className="mb-4">Registrar</h2>
             <Form>
+              <Form.Group controlId="formBasicName" className="mb-3">
+                <Form.Label>Nome</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Nome"
+                />
+              </Form.Group>
+
               <Form.Group controlId="formBasicEmail" className="mb-3">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
@@ -32,8 +57,8 @@ function Register({ onSwitchPage }) {
                 <Form.Label>Senha</Form.Label>
                 <Form.Control
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
                   placeholder="Senha"
                 />
               </Form.Group>

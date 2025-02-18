@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
+import api from "../api/api";
 import AddItemModal from "../modal/AddItemModal";
 
 function ToDoList({
@@ -8,42 +9,172 @@ function ToDoList({
   setNewTask,
   isEditing,
   addTask,
-  addList,
   lists,
+  setLists,
+  categories,
+  setCategories,
+  setTasks,
+  selectedList,
+  setSelectedList
 }) {
-  const [categories, setCategories] = useState(["Trabalho", "Escola", "Lazer"]);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showListModal, setShowListModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleAddCategory = (newCategory) => {
-    if (newCategory && !categories.includes(newCategory)) {
-      setCategories([...categories, newCategory]);
+  useEffect(() => {
+    initializeData();
+  }, []);
+
+  const initializeData = async () => {
+    await fetchCategories();
+    await fetchLists();
+  };
+
+  const addInitialCategory = async () => {
+    try {
+      const response = await api.post("/Categoria", { nome: "Geral", descricao: "Geral", inativo: false });
+      if (response.status === 200) {
+        console.log("Categoria inicial adicionada com sucesso.");
+        await fetchCategories();
+      } else {
+        setErrorMessage("Erro ao adicionar categoria inicial. Tente novamente.");
+      }
+    } catch (error) {
+      setErrorMessage("Erro ao adicionar categoria inicial. Tente novamente.");
+      console.log("Erro ao adicionar categoria inicial:", error.message);
     }
   };
 
-  const handleAddList = (newList) => {
-    addList(newList);
+  const addInitialList = async () => {
+    try {
+      const response = await api.post("/Lista", { nome: "Minha lista", descricao: "Minha lista", inativo: false });
+      if (response.status === 200) {
+        console.log("Lista inicial adicionada com sucesso.");
+        await fetchLists();
+      } else {
+        setErrorMessage("Erro ao adicionar lista inicial. Tente novamente.");
+      }
+    } catch (error) {
+      setErrorMessage("Erro ao adicionar lista inicial. Tente novamente.");
+      console.log("Erro ao adicionar lista inicial:", error.message);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const fetchLists = async () => {
+    try {
+      const listsResponse = await api.get("/Lista");
+      const activeLists = listsResponse.data.filter(list => !list.inativo);
+      console.log("Passou por fetchLists");
+      console.log(activeLists);
+      setLists(activeLists);
+      if (activeLists.length === 0) {
+        await addInitialList();
+      } else {
+        setNewTask(prevTask => ({
+          ...prevTask,
+          listaId: activeLists[0].id
+        }));
+        setSelectedList(activeLists[0].id);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar listas:", error.message);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const categoriesResponse = await api.get("/Categoria");
+      const activeCategories = categoriesResponse.data.filter(category => !category.inativo);
+      console.log("Passou por fetchCategories");
+      console.log(activeCategories)
+      setCategories(activeCategories);
+      if (activeCategories.length === 0) {
+        await addInitialCategory();
+      }
+    } catch (error) {
+      console.error("Erro ao carregar categorias:", error.message);
+    }
+  };
+
+  const handleAddCategory = async (newCategory) => {
+    if (newCategory && !categories.some(category => category.nome === newCategory)) {
+      try {
+        const response = await api.post("/Categoria", { nome: newCategory });
+        if (response.status === 200) {
+          setCategories(prevCategories => [...prevCategories, response.data]);
+        } else {
+          setErrorMessage("Erro ao adicionar categoria. Tente novamente.");
+        }
+      } catch (error) {
+        setErrorMessage("Erro ao adicionar categoria. Tente novamente.");
+        console.log("Erro ao adicionar categoria:", error.message);
+      }
+    }
+  };
+
+  const handleAddList = async (newList) => {
+    if (newList && !lists.some(list => list.nome === newList)) {
+      try {
+        const response = await api.post("/Lista", { nome: newList });
+        if (response.status === 200) {
+          setLists(prevLists => [...prevLists, response.data]);
+        } else {
+          setErrorMessage("Erro ao adicionar lista. Tente novamente.");
+        }
+      } catch (error) {
+        setErrorMessage("Erro ao adicionar lista. Tente novamente.");
+        console.log("Erro ao adicionar lista:", error.message);
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (
-      !newTask.title.trim() ||
-      !newTask.description.trim() ||
-      !newTask.date.trim() ||
-      !newTask.startTime.trim() ||
-      !newTask.endTime.trim() ||
-      !newTask.category.trim() ||
-      !newTask.list.trim() ||
-      !newTask.priority.trim() ||
+      !newTask.titulo.trim() ||
+      !newTask.descricao.trim() ||
+      !newTask.dataLimite.trim() ||
+      !newTask.prioridade.trim() ||
       !newTask.status.trim()
     ) {
       setErrorMessage("Por favor, preencha todos os campos.");
       return;
     }
     setErrorMessage("");
-    addTask(e);
+
+    const taskData = {
+      titulo: newTask.titulo,
+      descricao: newTask.descricao,
+      prioridade: newTask.prioridade,
+      status: newTask.status,
+      dataLimite: newTask.dataLimite,
+      listaId: newTask.listaId,
+      categoriaId: newTask.categoriaId,
+      inativo: false
+    };
+
+    try {
+      console.log(taskData);
+      const response = await api.post("/Tarefa", taskData);
+      if (response.status === 200) {
+        addTask(response.data);
+        setNewTask({
+          titulo: "",
+          descricao: "",
+          dataLimite: "",
+          listaId: "",
+          categoriaId: "",
+          prioridade: "",
+          status: "",
+          inativo: false
+        });
+      } else {
+        setErrorMessage("Erro ao adicionar tarefa. Tente novamente.");
+      }
+    } catch (error) {
+      setErrorMessage("Erro ao adicionar tarefa. Tente novamente.");
+      console.log("Erro ao adicionar tarefa:", error.message);
+    }
   };
 
   return (
@@ -58,8 +189,8 @@ function ToDoList({
           <Form.Control
             type="text"
             placeholder="Título da Tarefa"
-            value={newTask.title}
-            onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+            value={newTask.titulo}
+            onChange={(e) => setNewTask({ ...newTask, titulo: e.target.value })}
           />
         </Form.Group>
         <Form.Group controlId="formTaskDescription" className="mb-3">
@@ -67,45 +198,29 @@ function ToDoList({
           <Form.Control
             type="text"
             placeholder="Descrição da Tarefa"
-            value={newTask.description}
-            onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+            value={newTask.descricao}
+            onChange={(e) => setNewTask({ ...newTask, descricao: e.target.value })}
           />
         </Form.Group>
         <Form.Group controlId="formTaskDate" className="mb-3">
           <Form.Label className="fw-bold">Data</Form.Label>
           <Form.Control
             type="date"
-            value={newTask.date}
-            onChange={(e) => setNewTask({ ...newTask, date: e.target.value })}
-          />
-        </Form.Group>
-        <Form.Group controlId="formTaskStartTime" className="mb-3">
-          <Form.Label className="fw-bold">Hora de Início</Form.Label>
-          <Form.Control
-            type="time"
-            value={newTask.startTime}
-            onChange={(e) => setNewTask({ ...newTask, startTime: e.target.value })}
-          />
-        </Form.Group>
-        <Form.Group controlId="formTaskEndTime" className="mb-3">
-          <Form.Label className="fw-bold">Hora do Fim</Form.Label>
-          <Form.Control
-            type="time"
-            value={newTask.endTime}
-            onChange={(e) => setNewTask({ ...newTask, endTime: e.target.value })}
+            value={newTask.dataLimite}
+            onChange={(e) => setNewTask({ ...newTask, dataLimite: e.target.value })}
           />
         </Form.Group>
         <Form.Group controlId="formTaskCategory" className="mb-3">
           <Form.Label className="fw-bold">Categoria</Form.Label>
           <Form.Control
             as="select"
-            value={newTask.category}
-            onChange={(e) => setNewTask({ ...newTask, category: e.target.value })}
+            value={newTask.categoriaId}
+            onChange={(e) => setNewTask({ ...newTask, categoriaId: e.target.value })}
           >
             <option value="">Selecione uma categoria</option>
-            {categories.map((category, index) => (
-              <option key={index} value={category}>
-                {category}
+            {Array.isArray(categories) && categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.nome}
               </option>
             ))}
           </Form.Control>
@@ -117,13 +232,13 @@ function ToDoList({
           <Form.Label className="fw-bold">Lista</Form.Label>
           <Form.Control
             as="select"
-            value={newTask.list}
-            onChange={(e) => setNewTask({ ...newTask, list: e.target.value })}
+            value={newTask.listaId}
+            onChange={(e) => setNewTask({ ...newTask, listaId: e.target.value })}
           >
             <option value="">Selecione uma lista</option>
-            {lists.map((list, index) => (
-              <option key={index} value={list}>
-                {list}
+            {lists.map((list) => (
+              <option key={list.id} value={list.id}>
+                {list.nome}
               </option>
             ))}
           </Form.Control>
@@ -135,13 +250,13 @@ function ToDoList({
           <Form.Label className="fw-bold">Prioridade</Form.Label>
           <Form.Control
             as="select"
-            value={newTask.priority}
-            onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+            value={newTask.prioridade}
+            onChange={(e) => setNewTask({ ...newTask, prioridade: e.target.value })}
           >
             <option value="">Selecione uma prioridade</option>
-            <option value="Baixa">Baixa</option>
-            <option value="Média">Média</option>
-            <option value="Alta">Alta</option>
+            <option value="0">Baixa</option>
+            <option value="1">Média</option>
+            <option value="2">Alta</option>
           </Form.Control>
         </Form.Group>
         <Form.Group controlId="formTaskStatus" className="mb-3">

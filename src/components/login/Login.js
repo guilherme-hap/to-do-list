@@ -1,17 +1,30 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
+import axios from "axios";
+import { setAccessToken } from "../api/api";
 
 function Login({ onSwitchPage, setUser }) {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = () => {
-    if (email === "a@a.com" && password === "123") {
-      setUser({ name: "Usuário Exemplo", email });
-      onSwitchPage("todo");
-    } else {
-      setError("Credenciais incorretas.");
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post("https://localhost:7068/Login", {
+        email,
+        senha,
+      });
+
+      if (response.status === 200) {
+        setUser({ name: response.data.nomeUsuario, email });
+        setAccessToken(response.data.token);
+        onSwitchPage("todo");
+      } else {
+        setError("Credenciais incorretas.");
+      }
+    } catch (error) {
+      setError("Erro ao fazer login. Tente novamente mais tarde.");
+      console.log("Erro ao fazer login:", error.message);
     }
   };
 
@@ -36,8 +49,8 @@ function Login({ onSwitchPage, setUser }) {
                 <Form.Label>Senha</Form.Label>
                 <Form.Control
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
                   placeholder="Senha"
                 />
               </Form.Group>
