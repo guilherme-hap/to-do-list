@@ -115,13 +115,6 @@ function App() {
     setTasks(updatedTasks);
   };
 
-  const toggleFavorite = (index) => {
-    const updatedTasks = tasks.map((task, i) => 
-      i === index ? { ...task, favorite: !task.favorite } : task
-    );
-    setTasks(updatedTasks);
-  };
-
   const filteredTasks = tasks.filter(task => 
     task.listaId === selectedList &&
     (filterStatus ? task.status === filterStatus : true) &&
@@ -171,6 +164,7 @@ function App() {
                 setTasks={setTasks}
                 selectedList={selectedList}
                 setSelectedList={setSelectedList}
+                fetchTasks={fetchTasks}
               />
             </Col>
           )}
@@ -189,7 +183,7 @@ function App() {
                 ></iframe>
                 <Nav variant="tabs" activeKey={selectedList} onSelect={(selectedKey) => setSelectedList(selectedKey)}>
                   {lists.map((list) => (
-                    <Nav.Item key={list.id}>
+                    <Nav.Item key={list.id} onClick={() => setSelectedList(list.id)}>
                       <Nav.Link eventKey={list.id}>{list.nome}</Nav.Link>
                     </Nav.Item>
                   ))}
@@ -228,7 +222,7 @@ function App() {
                     />
                   </Form.Group>
                 )}
-                <TaskList tasks={filteredTasks} editTask={editTask} deleteTask={deleteTask} toggleFavorite={toggleFavorite} fetchTasks={fetchTasks} />
+                <TaskList tasks={filteredTasks} editTask={editTask} deleteTask={deleteTask} fetchTasks={fetchTasks} />
               </div>
             </Col>
           )}

@@ -13,9 +13,8 @@ function ToDoList({
   setLists,
   categories,
   setCategories,
-  setTasks,
-  selectedList,
-  setSelectedList
+  setSelectedList,
+  fetchTasks
 }) {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showListModal, setShowListModal] = useState(false);
@@ -33,7 +32,7 @@ function ToDoList({
   const addInitialCategory = async () => {
     try {
       const response = await api.post("/Categoria", { nome: "Geral", descricao: "Geral", inativo: false });
-      if (response.status === 200) {
+      if (response.data) {
         console.log("Categoria inicial adicionada com sucesso.");
         await fetchCategories();
       } else {
@@ -48,7 +47,7 @@ function ToDoList({
   const addInitialList = async () => {
     try {
       const response = await api.post("/Lista", { nome: "Minha lista", descricao: "Minha lista", inativo: false });
-      if (response.status === 200) {
+      if (response.data) {
         console.log("Lista inicial adicionada com sucesso.");
         await fetchLists();
       } else {
@@ -99,31 +98,50 @@ function ToDoList({
   const handleAddCategory = async (newCategory) => {
     if (newCategory && !categories.some(category => category.nome === newCategory)) {
       try {
-        const response = await api.post("/Categoria", { nome: newCategory });
-        if (response.status === 200) {
-          setCategories(prevCategories => [...prevCategories, response.data]);
-        } else {
-          setErrorMessage("Erro ao adicionar categoria. Tente novamente.");
-        }
+        const response = await api.post("/Categoria", { nome: newCategory, descricao: "", inativo: false });
+  
+        const newCat = response.data;
+          
+        // Atualiza categorias imediatamente
+        setCategories(prevCategories => [...prevCategories, newCat]);
+  
+        // Define a nova categoria como selecionada
+        setNewTask(prevTask => ({
+          ...prevTask,
+          categoriaId: newCat.id
+        }));
+
+        await fetchCategories();
       } catch (error) {
         setErrorMessage("Erro ao adicionar categoria. Tente novamente.");
-        console.log("Erro ao adicionar categoria:", error.message);
+        console.error("Erro ao adicionar categoria:", error.message);
       }
     }
   };
-
+  
   const handleAddList = async (newList) => {
     if (newList && !lists.some(list => list.nome === newList)) {
       try {
-        const response = await api.post("/Lista", { nome: newList });
-        if (response.status === 200) {
-          setLists(prevLists => [...prevLists, response.data]);
-        } else {
-          setErrorMessage("Erro ao adicionar lista. Tente novamente.");
-        }
+        const response = await api.post("/Lista", { nome: newList, descricao: "", inativo: false });
+  
+        const newLst = response.data;
+          
+        // Atualiza listas imediatamente
+        setLists(prevLists => [...prevLists, newLst]);
+  
+        // Define a nova lista como selecionada
+        setNewTask(prevTask => ({
+          ...prevTask,
+          listaId: newLst.id
+        }));
+
+        console.log(newLst.id);
+        setSelectedList(newLst.id);
+
+        await fetchLists();
       } catch (error) {
         setErrorMessage("Erro ao adicionar lista. Tente novamente.");
-        console.log("Erro ao adicionar lista:", error.message);
+        console.error("Erro ao adicionar lista:", error.message);
       }
     }
   };
@@ -156,21 +174,18 @@ function ToDoList({
     try {
       console.log(taskData);
       const response = await api.post("/Tarefa", taskData);
-      if (response.status === 200) {
-        addTask(response.data);
-        setNewTask({
-          titulo: "",
-          descricao: "",
-          dataLimite: "",
-          listaId: "",
-          categoriaId: "",
-          prioridade: "",
-          status: "",
-          inativo: false
-        });
-      } else {
-        setErrorMessage("Erro ao adicionar tarefa. Tente novamente.");
-      }
+      addTask(response.data);
+      setNewTask({
+        titulo: "",
+        descricao: "",
+        dataLimite: "",
+        listaId: "",
+        categoriaId: "",
+        prioridade: "",
+        status: "",
+        inativo: false
+      });
+      await fetchTasks();
     } catch (error) {
       setErrorMessage("Erro ao adicionar tarefa. Tente novamente.");
       console.log("Erro ao adicionar tarefa:", error.message);

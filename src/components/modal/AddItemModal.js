@@ -3,12 +3,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 
 const AddItemModal = ({ show, handleClose, handleAdd, itemType }) => {
   const [newItem, setNewItem] = useState("");
-
-  const handleSubmit = () => {
-    handleAdd(newItem);
-    setNewItem("");
-    handleClose();
-  };
+  const [description, setDescription] = useState("");
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -26,13 +21,23 @@ const AddItemModal = ({ show, handleClose, handleAdd, itemType }) => {
               placeholder={`Digite a nova ${itemType.toLowerCase()}`}
             />
           </Form.Group>
+          <Form.Group controlId="formDescription">
+            <Form.Label>Descrição da {itemType}</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder={`Digite a descrição da ${itemType.toLowerCase()}`}
+            />
+          </Form.Group>
         </Form>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
           Cancelar
         </Button>
-        <Button variant="primary" onClick={handleSubmit}>
+        <Button variant="primary" onClick={() => { handleAdd(newItem, description); handleClose(); }}>
           Adicionar
         </Button>
       </Modal.Footer>

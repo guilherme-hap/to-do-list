@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Accordion, Card, Button } from "react-bootstrap";
 import "./TaskList.css";
 
-const TaskList = ({ tasks, editTask, deleteTask, toggleFavorite, fetchTasks }) => {
+const TaskList = ({ tasks, editTask, deleteTask, fetchTasks }) => {
 
   useEffect(() => {
     fetchTasks();
@@ -14,7 +14,6 @@ const TaskList = ({ tasks, editTask, deleteTask, toggleFavorite, fetchTasks }) =
         <Accordion.Item eventKey={task.id.toString()} key={task.id}>
           <Accordion.Header as={Card.Header} style={{ cursor: "pointer" }}>
             {task.titulo}
-            {task.favorite && <span className="favorite"> ★</span>}
           </Accordion.Header>
           <Accordion.Collapse eventKey={task.id.toString()} transition="true">
             <Card.Body className="p-3">
@@ -41,9 +40,6 @@ const TaskList = ({ tasks, editTask, deleteTask, toggleFavorite, fetchTasks }) =
               </Button>
               <Button variant="danger" onClick={() => deleteTask(task.id)} className="me-2">
                 Deletar
-              </Button>
-              <Button variant="info" onClick={() => toggleFavorite(task.id)}>
-                {task.favorite ? "Desfavoritar" : "Favoritar"}
               </Button>
             </Card.Body>
           </Accordion.Collapse>

@@ -10,10 +10,9 @@ export const setAccessToken = (token) => {
   accessToken = token;
 };
 
-// Add an interceptor for all requests
 api.interceptors.request.use(config => {
-  // Add the access token to the Authorization header
-  if (accessToken) {
+
+    if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
 
