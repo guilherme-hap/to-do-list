@@ -1,0 +1,14 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  .vh-100 {
+    height: 100vh !important;
+  }
+  
+  .container {
+    max-width: 100% !important;
+  }
