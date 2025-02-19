@@ -7,14 +7,15 @@ function ToDoList({
   user,
   newTask,
   setNewTask,
-  isEditing,
   addTask,
   lists,
   setLists,
   categories,
   setCategories,
   setSelectedList,
-  fetchTasks
+  fetchTasks,
+  isEditing,
+  setIsEditing
 }) {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showListModal, setShowListModal] = useState(false);
@@ -28,6 +29,18 @@ function ToDoList({
     await fetchCategories();
     await fetchLists();
   };
+
+  function formatDateToYYYYMMDD(date) {
+    if (!(date instanceof Date)) {
+      throw new Error("O parâmetro deve ser um objeto Date válido.");
+    }
+  
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Mês começa do 0
+    const day = String(date.getDate() + 1).padStart(2, "0");
+  
+    return `${year}-${month}-${day}`;
+  }
 
   const addInitialCategory = async () => {
     try {
@@ -102,10 +115,8 @@ function ToDoList({
   
         const newCat = response.data;
           
-        // Atualiza categorias imediatamente
         setCategories(prevCategories => [...prevCategories, newCat]);
   
-        // Define a nova categoria como selecionada
         setNewTask(prevTask => ({
           ...prevTask,
           categoriaId: newCat.id
@@ -126,10 +137,8 @@ function ToDoList({
   
         const newLst = response.data;
           
-        // Atualiza listas imediatamente
         setLists(prevLists => [...prevLists, newLst]);
   
-        // Define a nova lista como selecionada
         setNewTask(prevTask => ({
           ...prevTask,
           listaId: newLst.id
@@ -152,7 +161,6 @@ function ToDoList({
       !newTask.titulo.trim() ||
       !newTask.descricao.trim() ||
       !newTask.dataLimite.trim() ||
-      !newTask.prioridade.trim() ||
       !newTask.status.trim()
     ) {
       setErrorMessage("Por favor, preencha todos os campos.");
@@ -172,9 +180,15 @@ function ToDoList({
     };
 
     try {
-      console.log(taskData);
-      const response = await api.post("/Tarefa", taskData);
-      addTask(response.data);
+      if (isEditing) {
+        taskData.dataLimite = formatDateToYYYYMMDD(new Date(taskData.dataLimite));
+        console.log(taskData.dataLimite);
+        await api.put(`/Tarefa/${newTask.id}`, taskData);
+        setIsEditing(false);
+      } else {
+        const response = await api.post("/Tarefa", taskData);
+        addTask(response.data);
+      }
       setNewTask({
         titulo: "",
         descricao: "",

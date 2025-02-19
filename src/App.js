@@ -84,7 +84,35 @@ function App() {
     setCurrentPage("todo");
   };
 
-  const addTask = (e) => {
+  const getCategoryName = (categoryId) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.nome : "Categoria não encontrada";
+  };
+
+  const getListName = (listId) => {
+    const list = lists.find(lst => lst.id === listId);
+    return list ? list.nome : "Lista não encontrada";
+  };
+
+  const getPriorityText = (priority) => {
+    switch (priority) {
+      case 0:
+        return "Baixa";
+      case 1:
+        return "Média";
+      case 2:
+        return "Alta";
+      default:
+        return "Desconhecida";
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(dateString).toLocaleDateString('pt-BR', options);
+  };
+
+  const addTask = () => {
     if (
       newTask.titulo.trim() &&
       newTask.descricao.trim() &&
@@ -93,14 +121,6 @@ function App() {
       newTask.prioridade.trim() &&
       newTask.status.trim()
     ) {
-      if (isEditing) {
-        const updatedTasks = [...tasks];
-        updatedTasks[currentTaskIndex] = newTask;
-        setTasks(updatedTasks);
-        setIsEditing(false);
-      } else {
-        setTasks([...tasks, newTask]);
-      }
       setNewTask({
         id: "",
         inativo: false,
@@ -110,21 +130,42 @@ function App() {
         prioridade: "",
         status: "",
         dataLimite: "",
-        listaId: "",
+        listaId: selectedList || "",
         categoriaId: ""
       });
     }
   };
 
-  const editTask = (index) => {
-    setNewTask(tasks[index]);
+  const editTask = async (task) => {
+    setNewTask({
+      ...task,
+      dataLimite: task.dataLimite.split('T')[0] // Ajuste o formato da data
+    });
     setIsEditing(true);
-    setCurrentTaskIndex(index);
+    setCurrentPage("todo");
   };
 
-  const deleteTask = (index) => {
-    const updatedTasks = tasks.filter((_, i) => i !== index);
-    setTasks(updatedTasks);
+  const deleteTask = async (task) => {
+    const updatedTasks = task.inativo ? tasks.filter((t) => t.id !== task.id) : tasks.map((t) => t.id === task.id ? { ...t, inativo: true } : t);
+    try {
+      const dataAtual = new Date();
+      const dataFormatada = new Date(dataAtual.getTime() - dataAtual.getTimezoneOffset() * 60000).toISOString(); 
+      const response = await api.put(`https://localhost:7068/Tarefa/${task.id}`, 
+      { titulo: task.titulo, 
+        dataLimite: dataFormatada, 
+        descricao: task.descricao, 
+        status: task.status, 
+        inativo: true, 
+        prioridade: task.prioridade, 
+        listaId: task.listaId, 
+        categoriaId: task.categoriaId 
+      });
+      if (response.status === 200) {
+        setTasks(updatedTasks);
+      }
+    } catch (error) {
+      console.log("Erro ao atualizar tarefa:", error.message);
+    }
   };
 
   const filteredTasks = tasks.filter(task => 
@@ -168,6 +209,7 @@ function App() {
                 newTask={newTask}
                 setNewTask={setNewTask}
                 isEditing={isEditing}
+                setIsEditing={setIsEditing}
                 addTask={addTask}
                 lists={lists}
                 setLists={setLists}
@@ -234,7 +276,19 @@ function App() {
                     />
                   </Form.Group>
                 )}
-                <TaskList tasks={filteredTasks} editTask={editTask} deleteTask={deleteTask} fetchTasks={fetchTasks} />
+                <TaskList 
+                  tasks={filteredTasks}
+                  editTask={editTask}
+                  deleteTask={deleteTask}
+                  fetchTasks={fetchTasks}
+                  lists={lists}
+                  categories={categories}
+                  getCategoryName={getCategoryName}
+                  getListName={getListName}
+                  getPriorityText={getPriorityText}
+                  formatDate={formatDate}
+                  setIsEditing={setIsEditing}
+                />
               </div>
             </Col>
           )}
