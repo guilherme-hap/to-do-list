@@ -294,10 +294,10 @@ function App() {
           )}
         </Row>
       ) : (
-        <Row className="flex-grow-1">
+        <Row className="flex-grow-1" style={{ overflow: "hidden", height: "100vh" }}>
           <Col md={6} className="p-3 mx-auto">
             {currentPage === "login" && (
-              <Login onSwitchPage={setCurrentPage} setUser={setLoggedInUser} />
+              <Login onSwitchPage={setCurrentPage} setUser={setLoggedInUser} sty/>
             )}
             {currentPage === "register" && <Register onSwitchPage={setCurrentPage} />}
           </Col>
