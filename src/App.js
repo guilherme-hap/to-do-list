@@ -171,7 +171,7 @@ function App() {
   const filteredTasks = tasks.filter(task => 
     task.listaId === selectedList &&
     (filterStatus ? task.status === filterStatus : true) &&
-    (filterDate ? task.dataLimite === filterDate : true)
+    (filterDate ? new Date(task.dataLimite).toISOString().split('T')[0] === filterDate : true)
   );
 
   const resetFilters = () => {
