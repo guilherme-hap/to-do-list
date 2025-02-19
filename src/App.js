@@ -41,12 +41,24 @@ function App() {
   const [showResetButton, setShowResetButton] = useState(false);
   const [lists, setLists] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [playlistUrl, setPlaylistUrl] = useState("");
 
   useEffect(() => {
     if (selectedList) {
       fetchTasks();
     }
   }, [selectedList]);
+
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+    if (currentHour >= 5 && currentHour < 12) {
+      setPlaylistUrl("https://open.spotify.com/playlist/5sXoVwAIZMZ2nCuQRND4Gf?si=zoPtGj9RRcS3wcABtnkUZA");
+    } else if (currentHour >= 12 && currentHour < 18) {
+      setPlaylistUrl("https://open.spotify.com/playlist/5gbPJoh5uzDoLoatPmULrR?si=PoA_gXR2RzqXW25pp4tKnQ");
+    } else {
+      setPlaylistUrl("https://open.spotify.com/playlist/0vvXsWCC9xrXsKd4FyS8kM?si=PIipHH4QSASiW_L-9UVloQ");
+    }
+  }, []);
 
   const fetchTasks = async () => {
     try {
@@ -171,16 +183,16 @@ function App() {
           {currentPage === "todo" && (
             <Col md={6} className="d-flex justify-content-center align-items-start p-3">
               <div className="w-100">
-                <iframe
+                {playlistUrl && (<iframe
                   title="spotify"
                   style={{ borderRadius: "12px" }}
-                  src="https://open.spotify.com/embed/playlist/0vvXsWCC9xrXsKd4FyS8kM?utm_source=generator&theme=0"
+                  src={`https://open.spotify.com/embed/playlist/${playlistUrl.split('/').pop()}?si=PIipHH4QSASiW_L-9UVloQ`}
                   width="100%"
                   height="152"
                   allowFullScreen=""
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                   loading="lazy"
-                ></iframe>
+                ></iframe>)}
                 <Nav variant="tabs" activeKey={selectedList} onSelect={(selectedKey) => setSelectedList(selectedKey)}>
                   {lists.map((list) => (
                     <Nav.Item key={list.id} onClick={() => setSelectedList(list.id)}>
