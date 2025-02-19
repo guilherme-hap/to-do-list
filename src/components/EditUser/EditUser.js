@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Image } from "react-bootstrap";
+import "./EditUser.css";
 
 const EditUser = ({ user, setUser, onSwitchPage }) => {
   const [editedUser, setEditedUser] = useState({ ...user });
@@ -11,7 +12,9 @@ const EditUser = ({ user, setUser, onSwitchPage }) => {
 
     if (name === "photo" && e.target.files.length > 0) {
       const file = e.target.files[0];
-      setPhotoPreview(URL.createObjectURL(file));
+      const filePath = URL.createObjectURL(file);
+      setPhotoPreview(filePath);
+      setEditedUser((prevState) => ({ ...prevState, photo: filePath }));
     }
   };
 
@@ -26,11 +29,17 @@ const EditUser = ({ user, setUser, onSwitchPage }) => {
         <h2 className="mb-4 text-center">Editar Usuário</h2>
 
         <Row className="mb-4">
-          <Col className="text-center">
+          <Col className="text-center d-flex justify-content-center align-items-center">
             {photoPreview ? (
-              <Image src={photoPreview} alt="Foto do usuário" rounded fluid />
+              <Image
+                src={photoPreview}
+                alt="Foto do usuário"
+                className="rounded-circle photo"
+              />
             ) : (
-              <div className="border p-4">Sem foto</div>
+              <div className="border p-4 no-photo d-flex justify-content-center align-items-center">
+                Sem foto
+              </div>
             )}
           </Col>
         </Row>

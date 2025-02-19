@@ -36,7 +36,7 @@ function ToDoList({
     }
   
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Mês começa do 0
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate() + 1).padStart(2, "0");
   
     return `${year}-${month}-${day}`;
@@ -44,13 +44,9 @@ function ToDoList({
 
   const addInitialCategory = async () => {
     try {
-      const response = await api.post("/Categoria", { nome: "Geral", descricao: "Geral", inativo: false });
-      if (response.data) {
-        console.log("Categoria inicial adicionada com sucesso.");
-        await fetchCategories();
-      } else {
-        setErrorMessage("Erro ao adicionar categoria inicial. Tente novamente.");
-      }
+      await api.post("/Categoria", { nome: "Geral", descricao: "Geral", inativo: false });
+      console.log("Categoria inicial adicionada com sucesso.");
+      await fetchCategories();
     } catch (error) {
       setErrorMessage("Erro ao adicionar categoria inicial. Tente novamente.");
       console.log("Erro ao adicionar categoria inicial:", error.message);
@@ -59,13 +55,9 @@ function ToDoList({
 
   const addInitialList = async () => {
     try {
-      const response = await api.post("/Lista", { nome: "Minha lista", descricao: "Minha lista", inativo: false });
-      if (response.data) {
-        console.log("Lista inicial adicionada com sucesso.");
-        await fetchLists();
-      } else {
-        setErrorMessage("Erro ao adicionar lista inicial. Tente novamente.");
-      }
+      await api.post("/Lista", { nome: "Minha lista", descricao: "Minha lista", inativo: false });
+      console.log("Lista inicial adicionada com sucesso.");
+      await fetchLists();
     } catch (error) {
       setErrorMessage("Erro ao adicionar lista inicial. Tente novamente.");
       console.log("Erro ao adicionar lista inicial:", error.message);
@@ -76,8 +68,6 @@ function ToDoList({
     try {
       const listsResponse = await api.get("/Lista");
       const activeLists = listsResponse.data.filter(list => !list.inativo);
-      console.log("Passou por fetchLists");
-      console.log(activeLists);
       setLists(activeLists);
       if (activeLists.length === 0) {
         await addInitialList();
@@ -97,8 +87,6 @@ function ToDoList({
     try {
       const categoriesResponse = await api.get("/Categoria");
       const activeCategories = categoriesResponse.data.filter(category => !category.inativo);
-      console.log("Passou por fetchCategories");
-      console.log(activeCategories)
       setCategories(activeCategories);
       if (activeCategories.length === 0) {
         await addInitialCategory();
